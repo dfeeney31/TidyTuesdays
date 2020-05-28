@@ -15,6 +15,6 @@ BC %>%
   summarize(
     nIngred = n()
   ) %>%
-  ggplot(mapping = aes(nIngred, fill = category)) + geom_histogram(stat="count")
+  ggplot(mapping = aes(nIngred, fill = category)) + geom_histogram(stat="count") + facet_wrap(~ category)
 
 
