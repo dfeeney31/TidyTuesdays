@@ -4,9 +4,8 @@ library(ggridges)
 rm(list=ls())
 BC <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/boston_cocktails.csv')
 
-BC
 
-# Basic look --------------------------------------------------------------
+# Basic look at the data  --------------------------------------------------------------
 BC
 
 BC %>%
@@ -23,6 +22,7 @@ BC %>%
   ggplot(mapping = aes(nIngred, fill = category )) + geom_histogram(stat="count") + 
   facet_wrap(~ category)
 
+
 BC %>%
   group_by(name, category) %>%
   summarize(
@@ -35,7 +35,7 @@ BC %>%
 
 
 BC %>% count(measure, sort = TRUE)
-# replace all of the fractions with decimals (taken from Hadley Wickham's YouTube)
+# replace all of the fractions with decimals (taken from Hadley Wickham's YouTube on parsing the text)
 sizes <- BC %>%
   filter(str_detect(measure, "oz")) %>%
   mutate(oz = str_replace(measure, " oz", "")) %>%
@@ -45,5 +45,4 @@ sizes <- BC %>%
   mutate(oz = str_replace(oz, " ?2/3", "0.33")) %>%
   mutate(oz = str_replace(oz, " ?2/3", "0.66")) 
 
-filter(sizes, oz > 5)
  
