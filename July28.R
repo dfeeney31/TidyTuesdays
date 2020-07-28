@@ -20,10 +20,10 @@ penguinDat %>%
 #Other NA are just for the sex, and could be imputed by the other dependent variables
 #use mice to evaluate where missingness exists
 md.pattern(penguinDat)
+penguinDat$sex <- as.factor(penguinDat$sex)
 #Use Mice (Multivariate Imputation by Chained Equations) to impute missingness
 miceMod <- mice(penguinDat, method="rf")  # perform mice imputation, based on random forests.
 penguinOut <- complete(miceMod)  # generate the completed data.
-md.pattern(penguinOut) #missingness fixed except for sex
 
 #Similar to Iris data, they seem to be separated by flipper length and body mass (at least Gentoo and the others.)
 # Males seem to have slightly longer flipper lengths and are heavier
@@ -32,11 +32,30 @@ ggplot(mapping = aes(x = body_mass_g, y = flipper_length_mm, colour = species), 
 
 
 # Does mass differ by island for a given penguin? Not really. Only the Adelie penguins come frmo different islands anyway
-penguinDat %>%
-  group_by(species, island) %>%
+penguinOut %>%
+  group_by(species, island, sex) %>%
   summarize(
     avgMass = mean(body_mass_g)
   )
 
 
 #Are there things that better differentiate Adelle and Chinstrap?
+
+# PCA ---------------------------------------------------------------------
+#prepare by scaling
+library(ggfortify)
+library(magick)
+library(cowplot)
+penguinScaled <- scale(penguinOut[,3:6])
+
+penguinPCA <- prcomp(penguinScaled)
+penguinPCA
+summary(penguinPCA)
+
+pcaPlot <- autoplot(penguinPCA, data = penguinOut, colour = 'species')
+
+ggdraw() +
+  draw_plot(pcaPlot) +
+  draw_image("C:/Users/Daniel.Feeney/Documents/tidyTuesdays/Chinstrap-penguin.JPG",  x = -0.3, y = -0.3, scale = .2) +
+  draw_image("C:/Users/Daniel.Feeney/Documents/tidyTuesdays/adelie.JPG", x = -0.2, y = 0.4, scale = .15) +
+  draw_image("C:/Users/Daniel.Feeney/Documents/tidyTuesdays/gentoo.JPG", x = 0.27, y = 0.35, scale = .25) 
